@@ -25,4 +25,7 @@ app.use('/user', userRouter);
 
 app.use('/api', aiRouter);
 
-app.listen(3000, () => console.log('🚀 Server on http://localhost:3000'));
+// app.listen(3000, () => console.log('🚀 Server on http://localhost:3000'));
+app.listen(process.env.PORT || 3000, () =>
+  console.log(`🚀 Server running on port ${process.env.PORT || 3000}`)
+);
