@@ -1,4 +1,2 @@
-# The files that are not to be uploaded on github
-
 .env
 node_modules
