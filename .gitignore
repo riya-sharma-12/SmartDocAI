@@ -1,4 +1,4 @@
 # The files that are not to be uploaded on github
 
-.envv
+.env
 node_modules
