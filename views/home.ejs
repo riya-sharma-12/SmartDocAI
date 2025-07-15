@@ -1,0 +1,446 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+  @media (max-width: 768px) {
+    body {
+      transform: scale(0.75);
+      transform-origin: top left;
+      width: 133.33%;
+    }
+  }
+  @media (max-width: 480px) {
+    body {
+      transform: scale(0.6);
+      transform-origin: top left;
+      width: 166.66%;
+    }
+  }
+</style>
+
+  <title>SmartDocAI Dashboard</title>
+</head>
+<body class="h-screen flex bg-purple-50 font-sans">
+
+  <aside class="w-64 bg-white shadow h-full flex flex-col">
+    <div class="p-4 border-b">
+      <a href="/user/home" ><h1 class="text-lg font-bold text-purple-800 mb-4 cursor-pointer" onclick="/user/home">SmartDocAI</h1></a>
+      <button onclick="showUpload()" class="w-full bg-yellow-400 text-purple-800 font-semibold py-2 rounded hover:bg-yellow-300 transition mb-4">
+        + Upload PDF
+      </button>
+    </div>
+<div class="min-w-0 flex-1 overflow-hidden">
+  <ul id="file-list" class="space-y-2 p-4">
+  <% files.forEach(file => { %>
+    <li class="group flex justify-between items-center p-2 rounded hover:bg-purple-100">
+<span 
+  class="cursor-pointer block truncate hover:whitespace-normal hover:break-words"
+  onclick="selectFile('<%= file._id %>', '<%= file.originalname %>')"
+>
+  📄&nbsp;<%= file.originalname %>
+</span>
+
+  <button onclick="deleteFile(event, '<%= file._id %>')" 
+    class="ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition" 
+    title="Delete">
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 3h6a1 1 0 011 1v1H8V4a1 1 0 011-1z" />
+    </svg>
+  </button>
+</li>
+
+  <% }) %>
+</ul>
+
+    </div>
+     <div class="p-4 border-t mt-auto">
+    <a href="/user/logout" class="block w-full text-center bg-purple-100 text-purple-800 font-semibold py-2 rounded hover:bg-purple-200 transition">
+      Logout
+    </a>
+  </div>
+  </aside>
+
+  <!-- <div class="flex flex-1 overflow-hidden"> -->
+<div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+
+    <main class="flex-1 p-8 overflow-y-auto">
+      <h1 id="doc-title" class="text-2xl font-bold text-purple-800 mb-4">Select a file to start</h1>
+      <p id="doc-summary" class="text-purple-600 mb-6">Your summary, insights, and tools will appear here as you explore.
+<br><br>
+Want to revisit a summary or flashcards you generated earlier?
+Just refresh the page — everything you explored before stays saved in the chat on the right. 
+ </p>
+      <div id="feature-buttons" class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+        <button onclick="showDetail('summary')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">📝 Summarize</button>
+        <button onclick="showDetail('topicwise')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">📑 Topic-wise</button>
+        <button onclick="showDetail('keywords')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">💡 Key Words</button>
+        <button onclick="showDetail('questions')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">🎯 Exam Q&A</button>
+        <button onclick="showDetail('flashcards')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">📚 Flashcards</button>
+        <button onclick="showDetail('time')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">⏱ Reading Time</button>
+      </div>
+
+      <div id="output" class="space-y-4">
+        <p class="text-gray-700">When you click on a feature, the detailed output will be shown here.</p>
+      </div>
+    </main>
+
+    <aside class="flex-[0.65] h-full bg-white shadow-lg flex flex-col p-4">
+<h3 class="text-lg font-bold text-purple-800 mb-4 border-b border-purple-200 pb-2">
+  Chat with SmartDocAI 💬
+</h3>
+      <div id="chat-history" class="flex-1 overflow-y-auto space-y-3 pr-2">
+        <div class="text-left"><div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs">Hello! Ready to help with your docs.</div></div>
+      </div>
+      <form onsubmit="askQuestion(event)" class="flex space-x-2 mt-4">
+        <input type="text" id="chat-input" placeholder="Ask your question..." 
+               class="flex-1 border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+        <button class="bg-yellow-400 text-purple-800 px-4 py-2 rounded hover:bg-yellow-300">Ask</button>
+      </form>
+    </aside>
+  </div>
+
+  <div class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm hidden items-center justify-center z-50" id="upload-modal">
+    <form action="/user/upload" method="post" enctype="multipart/form-data"
+          class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col space-y-6">
+     <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-purple-400 rounded-lg cursor-pointer hover:bg-purple-50 transition">
+  <p class="text-sm text-purple-700 font-semibold">Click to upload or drag & drop PDF / DOCX</p>
+  <input id="dropzone-file" name="file" type="file" class="hidden" onchange="showFileName()">
+</label>
+<p id="file-name" class="text-purple-800 text-sm mt-2 text-center hidden"></p>
+
+      <button type="submit" class="bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">Upload</button>
+      <button type="button" onclick="hideUpload()" class="text-purple-600 hover:underline text-sm">Cancel</button>
+    </form>
+  </div>
+
+<script>
+function showUpload() {
+  document.getElementById('upload-modal').style.display = 'flex';
+}
+function hideUpload() {
+  document.getElementById('upload-modal').style.display = 'none';
+}
+async function selectFile(id, name) {
+  window.currentDocId = id;
+  document.getElementById('doc-title').innerText = name;
+  document.getElementById('doc-summary').innerText = "Your document is loaded and ready.";
+  document.getElementById('output').innerHTML = `<p class="text-gray-700">Choose a tool above to analyze ${name}.</p>`;
+
+  const historyDiv = document.getElementById('chat-history');
+  historyDiv.innerHTML = '';
+
+  try {
+    const res = await fetch('/api/load-chat', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docId: id })
+    });
+    const data = await res.json();
+    if (data.history && data.history.length > 0) {
+      data.history.forEach(item => {
+        const bubble = document.createElement('div');
+        bubble.className = item.sender === 'user' ? "text-right" : "text-left";
+        // bubble.innerHTML = `<div class="inline-block ${item.sender === 'user' ? 'bg-yellow-100' : 'bg-purple-100'} text-purple-800 p-2 rounded-lg max-w-xs mt-1">${item.message}</div>`;
+        bubble.innerHTML = `<div class="inline-block ${item.sender === 'user' ? 'bg-yellow-100' : 'bg-purple-100'} 
+    text-purple-800 p-2 rounded-lg max-w-xs mt-1 whitespace-pre-line">${item.message}</div>`;
+        historyDiv.appendChild(bubble);
+      });
+      const loadedLine = document.createElement('div');
+      loadedLine.className = "text-center text-xs text-gray-500";
+      loadedLine.innerText = "Previous chat history loaded.";
+      historyDiv.appendChild(loadedLine);
+      historyDiv.scrollTop = historyDiv.scrollHeight;
+    }
+  } 
+  catch (err) {
+    console.error("Could not load chat history:", err);
+  }
+
+  // always show ready line in UI, never saved
+  const aiBubble = document.createElement('div');
+  aiBubble.className = "text-left";
+  aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Loaded ${name}, ready to chat!</div>`;
+  historyDiv.appendChild(aiBubble);
+  historyDiv.scrollTop = historyDiv.scrollHeight;
+}
+
+async function runFeature(featureName) {
+  const docId = window.currentDocId;
+  document.getElementById('output').innerHTML = `<p>Loading ${featureName}...</p>`;
+
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docId, feature: featureName })
+    });
+    const data = await res.json();
+    document.getElementById('output').innerHTML = `<pre>${data.answer}</pre>`;
+  } catch (err) {
+    document.getElementById('output').innerHTML = `<p class="text-red-600">Failed to load. Please try again.</p>`;
+    console.error("Feature failed:", err);
+  }
+}
+
+
+async function askQuestion() {
+  const question = document.getElementById('chat-input').value.trim();
+  if (!question) return;
+
+  const historyDiv = document.getElementById('chat-history');
+  const userBubble = document.createElement('div');
+  userBubble.className = "text-right";
+  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${question}</div>`;
+  historyDiv.appendChild(userBubble);
+  historyDiv.scrollTop = historyDiv.scrollHeight;
+
+  document.getElementById('chat-input').value = '';
+
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docId: window.currentDocId, feature: "chat", question })
+    });
+    const data = await res.json();
+    const aiBubble = document.createElement('div');
+    aiBubble.className = "text-left";
+    aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer}</div>`;
+    historyDiv.appendChild(aiBubble);
+    historyDiv.scrollTop = historyDiv.scrollHeight;
+  } catch (err) {
+    console.error("Chat failed:", err);
+    const aiBubble = document.createElement('div');
+    aiBubble.className = "text-left";
+    aiBubble.innerHTML = `<div class="inline-block bg-red-100 text-red-800 p-2 rounded-lg max-w-xs mt-1">Failed to get response.</div>`;
+    historyDiv.appendChild(aiBubble);
+    historyDiv.scrollTop = historyDiv.scrollHeight;
+  }
+}
+async function showDetail(feature) {
+  const docId = window.currentDocId;
+  if (!docId) return alert("Select a document first.");
+
+  document.getElementById('output').innerHTML = `<p class="text-gray-700">Loading ${feature}...</p>`;
+
+  const res = await fetch('/api/ai', {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ docId, feature })
+  });
+  const data = await res.json();
+
+  if (data.error) {
+    document.getElementById('output').innerHTML = `<p class="text-red-500">${data.error}</p>`;
+    return;
+  }
+
+  let contentHtml = `<pre class="whitespace-pre-line text-gray-700">${data.answer}</pre>`;
+
+  // ✅ Only for flashcards, add the download button
+  if (feature === "flashcards") {
+    contentHtml += `
+      <button onclick="generateFlashcardPDF()" 
+              class="mt-4 bg-yellow-400 text-purple-800 font-semibold py-2 px-4 rounded hover:bg-yellow-300 transition">
+        📥 Download Flashcards PDF
+      </button>
+    `;
+  }
+
+  document.getElementById('output').innerHTML = `<div class="space-y-4">${contentHtml}</div>`;
+}
+
+
+async function askQuestion(e) {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const question = input.value.trim();
+  if (!question) return;
+
+  // Append user message
+  const history = document.getElementById('chat-history');
+  const userBubble = document.createElement('div');
+  userBubble.className = "text-right";
+  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs">${question}</div>`;
+  history.appendChild(userBubble);
+
+  // Send to backend
+  const res = await fetch('/api/ai', {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ docId: window.currentDocId, feature: 'chat', question })
+  });
+  const data = await res.json();
+
+  // Append AI response
+  const aiBubble = document.createElement('div');
+  aiBubble.className = "text-left";
+aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer.replace(/\n/g, '<br>')}</div>`;
+  history.appendChild(aiBubble);
+  history.scrollTop = history.scrollHeight;
+  input.value = '';
+}
+
+async function askQuestion(e) {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const question = input.value.trim();
+  if (!question) return;
+
+  const history = document.getElementById('chat-history');
+
+  // Append user message
+  const userBubble = document.createElement('div');
+  userBubble.className = "text-right";
+  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs">${question}</div>`;
+  history.appendChild(userBubble);
+  input.value = '';
+
+  // Show "thinking"
+  const aiBubble = document.createElement('div');
+  aiBubble.className = "text-left";
+  aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Thinking...</div>`;
+  history.appendChild(aiBubble);
+  history.scrollTop = history.scrollHeight;
+
+  // Call backend AI
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docId: window.currentDocId, feature: 'chat', question })
+    });
+    const data = await res.json();
+    if (data.error) {
+      aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Error: ${data.error}</div>`;
+    } else {
+      aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer}</div>`;
+    }
+  } catch (err) {
+    aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Server error.</div>`;
+  }
+  history.scrollTop = history.scrollHeight;
+}
+async function deleteFile(e, fileId) {
+  e.stopPropagation();
+
+  console.log("📢 Calling delete API for fileId:", fileId);
+
+  if (!confirm("Are you sure you want to delete this file? This action cannot be undone.")) return;
+
+  try {
+    const res = await fetch(`/user/delete/${fileId}`, { method: 'POST' });
+    console.log("📬 Received response:", res);
+
+    if (res.ok) {
+      const li = e.target.closest('li');
+      li.remove();
+    } else {
+      alert("Failed to delete the file.");
+    }
+  } catch (err) {
+    console.error("🚨 Fetch error:", err);
+    alert("Server error. Could not delete the file.");
+  }
+}
+
+function generateFlashcardPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFont("helvetica");
+
+  // Get text from your flashcard area
+  const text = document.querySelector("#output pre").innerText;
+
+  // Split by cards
+  const cards = text.split(/\n(?=Card \d+)/);
+
+  let y = 20;
+  let page = 1;
+
+  cards.forEach(card => {
+    if (!card.trim()) return;
+
+    // Parse card content
+    const lines = card.split('\n').filter(l => l.trim());
+    const term = lines.find(line => line.startsWith('Term:')) || '';
+    const explanationLines = lines.slice(1);
+
+    // Draw term big & bold
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text(term.replace('Term:', '').trim(), 10, y);
+
+    y += 8;
+
+    // Draw explanation normal
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    const explanation = explanationLines.join(' ');
+    const splitText = doc.splitTextToSize(explanation, 180);
+    doc.text(splitText, 10, y);
+    y += splitText.length * 6 + 6;
+
+    // If near end of page, add new page
+    if (y > 260) {
+      doc.addPage();
+      y = 20;
+      page++;
+    }
+  });
+
+  doc.save(`SmartDocAI_Flashcards.pdf`);
+}
+
+let isResizing = false;
+
+const dragbar = document.getElementById('dragbar');
+const chatPane = document.getElementById('chat-pane');
+const mainPane = document.getElementById('main-pane');
+
+dragbar.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  document.body.style.cursor = 'col-resize';
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isResizing) return;
+  const containerWidth = dragbar.parentElement.offsetWidth;
+  const newChatWidth = containerWidth - e.clientX;
+
+  // min & max limits
+  if (newChatWidth < 200) return;
+  if (newChatWidth > containerWidth * 0.7) return;
+
+  chatPane.style.width = `${newChatWidth}px`;
+});
+
+document.addEventListener('mouseup', () => {
+  isResizing = false;
+  document.body.style.cursor = '';
+});
+function showFileName() {
+  const input = document.getElementById('dropzone-file');
+  const fileName = input.files.length > 0 ? input.files[0].name : '';
+  const display = fileName ? `Selected file: ${fileName}` : '';
+
+  const fileNameEl = document.getElementById('file-name');
+  fileNameEl.textContent = display;
+
+  if (fileName) {
+    fileNameEl.classList.remove('hidden');
+  } else {
+    fileNameEl.classList.add('hidden');
+  }
+}
+
+</script>
+
+</body>
+</html> 

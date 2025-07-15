@@ -1,0 +1,5 @@
+# The files that are not to be uploaded on github
+
+.envv
+node_modules
+drive-ef473-firebase-adminsdk-fbsvc-93d5ceff4a.json

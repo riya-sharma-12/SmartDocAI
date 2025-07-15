@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartDocAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .scroll-fade p { opacity: 0.2; transition: all 0.5s; }
+    .scroll-fade p.active { opacity: 1; transform: scale(1.02); }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-purple-700 text-white">
+
+  <!-- Navbar -->
+<nav class="flex flex-col sm:flex-row justify-between items-center p-6 max-w-7xl mx-auto">
+  <a href="#" class="text-2xl font-bold cursor-pointer mb-4 sm:mb-0">SmartDocAI</a>
+  <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 items-center">
+    <a href="#" class="hover:underline">Home</a>
+    <a href="#features" class="hover:underline">Features</a>
+    <a href="#more" class="hover:underline">More</a>
+    <a href="/user/login" class="hover:underline">Login</a>
+    <a href="/user/signup" class="bg-yellow-400 text-purple-800 px-4 py-2 rounded hover:bg-yellow-300">Start Free</a>
+  </div>
+</nav>
+
+
+
+  <!-- Hero -->
+  <section id="hero" class="text-center py-16 sm:py-24 md:py-32 px-4 mt-6">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+      Smarter reading, easier studying,<br>better work.
+    </h1>
+    <p class="text-lg sm:text-xl max-w-2xl mx-auto mb-10 text-purple-100">
+      From PDFs and Word docs to slides — generate summaries, flashcards, keywords, and exam Q&As. 
+      SmartDocAI makes every document easier to master.
+    </p>
+    <a href="/user/signup" class="bg-yellow-400 text-purple-800 px-6 sm:px-8 py-3 sm:py-4 rounded text-base sm:text-lg font-bold hover:bg-yellow-300 inline-block">
+      Get SmartDocAI
+    </a>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="bg-gray-50 text-gray-800 py-16 sm:py-24 px-4">
+    <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16 text-purple-800">Our Features</h2>
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 sm:gap-12">
+      <div class="group p-6 sm:p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition hover:bg-purple-50">
+        <h3 class="text-xl sm:text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">📝 Summarize Anything</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Upload textbooks, articles, research papers or lengthy PDFs and get concise, clear summaries tailored to your learning style. Perfect for tackling complex subjects in minutes, not hours.
+        </p>
+      </div>
+
+      <div class="group p-6 sm:p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition hover:bg-purple-50">
+        <h3 class="text-xl sm:text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">💡 Understand Faster</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Break down dense material into easy topic-by-topic insights and interactive flashcards, so you truly master what you read — not just skim it.
+        </p>
+      </div>
+
+      <div class="group p-6 sm:p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition hover:bg-purple-50">
+        <h3 class="text-xl sm:text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">📚 Never Lose Your Insights</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Every summary, question, and chat you create is saved automatically. Build a personalized knowledge hub that grows with you — always just a click away.
+        </p>
+      </div>
+
+      <div class="group p-6 sm:p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition hover:bg-purple-50">
+        <h3 class="text-xl sm:text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">🎯 Ace Exams with Auto Q&A</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Get automatically generated likely exam questions and answers from your uploaded content. Test yourself, learn faster, and be perfectly prepared for assessments or viva questions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- More reasons -->
+  <section id="more" class="bg-gradient-to-b from-purple-50 via-white to-purple-50 text-purple-800 pt-16 sm:pt-20 pb-24 sm:pb-32 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold mb-12 sm:mb-16">Even more reasons to join SmartDocAI</h2>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 px-4">
+      <div class="p-5 sm:p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">📚 Upload PDFs, DOCX & PPT notes instantly</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">⏱ Get clear overall summaries in seconds</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">📝 View detailed topic-wise breakdowns on click</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">💡 See key concepts & definitions highlighted</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">🎯 Auto-generate likely exam Q&A</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">📑 Get instant downloadable flashcards</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">💬 Ask any question directly on your doc</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">🗂 Track your study history on dashboard</p>
+      </div>
+      <div class="p-5 sm:p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+        <p class="text-lg sm:text-xl font-semibold">✨ Estimate reading time before you start</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-purple-800 text-purple-100 pt-12 pb-6 mt-0 border-t border-purple-700">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 text-sm">
+      <div>
+        <h4 class="font-bold mb-4">Product</h4>
+        <a href="#features" class="block hover:underline mb-2">Features</a>
+        <a href="#more" class="block hover:underline">Why Join</a>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Learn</h4>
+        <a href="#" class="block hover:underline mb-2">Blog</a>
+        <a href="#" class="block hover:underline">Quickstart</a>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Help</h4>
+        <a href="#" class="block hover:underline mb-2">User Guide</a>
+        <a href="#" class="block hover:underline">FAQs</a>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Company</h4>
+        <a href="#" class="block hover:underline mb-2">About Us</a>
+        <a href="#" class="block hover:underline">Privacy</a>
+      </div>
+    </div>
+    <div class="text-center mt-12 text-xs">
+      © <script>document.write(new Date().getFullYear())</script> SmartDocAI. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script>
+    let lines = document.querySelectorAll('.scroll-fade p');
+    let index = 0;
+    setInterval(() => {
+      lines.forEach(l => l.classList.remove('active'));
+      lines[index].classList.add('active');
+      index = (index + 1) % lines.length;
+    }, 1800);
+  </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartDocAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .scroll-fade p { opacity: 0.2; transition: all 0.5s; }
+    .scroll-fade p.active { opacity: 1; transform: scale(1.02); }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+  </style>
+</head>
+<body class="bg-purple-700 text-white">
+
+  <nav class="flex justify-between items-center p-6 max-w-7xl mx-auto">
+<a href="#" class="text-2xl font-bold cursor-pointer">SmartDocAI</a>
+    <div class="space-x-6">
+      <a href="#" class="hover:underline">Home</a>
+      <a href="#features" class="hover:underline">Features</a>
+      <a href="#more" class="hover:underline">More</a>
+      <a href="/user/login" class="hover:underline">Login</a>
+      <a href="/user/signup" class="bg-yellow-400 text-purple-800 px-4 py-2 rounded hover:bg-yellow-300">Start Free</a>
+    </div>
+  </nav>
+
+  <section id="hero" class="text-center py-32 px-4 mt-10">
+    <h1 class="text-5xl font-extrabold mb-6 leading-tight">
+      Smarter reading, easier studying, <br>better work.
+    </h1>
+    <p class="text-xl max-w-2xl mx-auto mb-10 text-purple-100">
+      From PDFs and Word docs to slides — generate summaries, flashcards, keywords, and exam Q&As. 
+    SmartDocAI makes every document easier to master.
+    </p>
+    <a href="/user/signup" class="bg-yellow-400 text-purple-800 px-8 py-4 rounded text-lg font-bold hover:bg-yellow-300">
+      Get SmartDocAI
+    </a>
+   
+
+  </section>
+
+ <section id="features" class="bg-gray-50 text-gray-800 py-24 px-6">
+  <h2 class="text-4xl font-bold text-center mb-16 text-purple-800">Our Features</h2>
+  <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-12">
+
+    <div class="group p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition duration-300 hover:bg-purple-50">
+      <h3 class="text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">📝 Summarize Anything</h3>
+      <p class="text-gray-700 leading-relaxed">
+        Upload textbooks, articles, research papers or lengthy PDFs and get concise, clear summaries 
+        tailored to your learning style. Perfect for tackling complex subjects in minutes, not hours.
+      </p>
+    </div>
+
+    <div class="group p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition duration-300 hover:bg-purple-50">
+      <h3 class="text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">💡 Understand Faster</h3>
+      <p class="text-gray-700 leading-relaxed">
+        Break down dense material into easy topic-by-topic insights and interactive flashcards,
+        so you truly master what you read — not just skim it.
+      </p>
+    </div>
+
+    <div class="group p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition duration-300 hover:bg-purple-50">
+      <h3 class="text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">📚 Never Lose Your Insights</h3>
+      <p class="text-gray-700 leading-relaxed">
+        Every summary, question, and chat you create is saved automatically.
+Build a personalized knowledge hub that grows with you — always just a click away.
+      </p>
+    </div>
+
+    <div class="group p-8 bg-white border border-purple-100 rounded-2xl shadow hover:shadow-xl transition duration-300 hover:bg-purple-50">
+      <h3 class="text-2xl font-bold mb-3 text-purple-800 group-hover:text-yellow-500 transition">🎯 Ace Exams with Auto Q&A</h3>
+      <p class="text-gray-700 leading-relaxed">
+        Get automatically generated likely exam questions and answers from your uploaded content. 
+        Test yourself, learn faster, and be perfectly prepared for assessments or viva questions.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<section id="more" class="bg-gradient-to-b from-purple-50 via-white to-purple-50 text-purple-800 pt-20 pb-32 text-center">
+  <h2 class="text-4xl font-bold mb-16 text-purple-800">
+    Even more reasons to join SmartDocAI
+  </h2>
+
+  <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
+    <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">📚 Upload PDFs, DOCX & PPT notes instantly</p>
+    </div>
+    <div class="p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">⏱ Get clear overall summaries in seconds</p>
+    </div>
+    <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">📝 View detailed topic-wise breakdowns on click</p>
+    </div>
+    <div class="p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">💡 See key concepts & definitions highlighted</p>
+    </div>
+    <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">🎯 Auto-generate likely exam Q&A</p>
+    </div>
+    <div class="p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">📑 Get instant downloadable flashcards</p>
+    </div>
+    <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">💬 Ask any question directly on your doc</p>
+    </div>
+    <div class="p-6 bg-purple-50 border-l-4 border-purple-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">🗂 Track your study history on dashboard</p>
+    </div>
+    <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow hover:shadow-lg hover:scale-105 transition">
+      <p class="text-xl font-semibold text-purple-800">✨ Estimate reading time before you start</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+ <footer class="bg-purple-800 text-purple-100 pt-12 pb-6 mt-0 border-t border-purple-700">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
+    <div>
+      <h4 class="font-bold mb-4">Product</h4>
+      <a href="#features" class="block hover:underline mb-2">Features</a>
+      <a href="#more" class="block hover:underline">Why Join</a>
+    </div>
+    <div>
+      <h4 class="font-bold mb-4">Learn</h4>
+      <a href="#" class="block hover:underline mb-2">Blog</a>
+      <a href="#" class="block hover:underline">Quickstart</a>
+    </div>
+    <div>
+      <h4 class="font-bold mb-4">Help</h4>
+      <a href="#" class="block hover:underline mb-2">User Guide</a>
+      <a href="#" class="block hover:underline">FAQs</a>
+    </div>
+    <div>
+      <h4 class="font-bold mb-4">Company</h4>
+      <a href="#" class="block hover:underline mb-2">About Us</a>
+      <a href="#" class="block hover:underline">Privacy</a>
+    </div>
+  </div>
+  <div class="text-center mt-12 text-xs">
+    © <script>document.write(new Date().getFullYear())</script> SmartDocAI. All Rights Reserved.
+  </div>
+</footer>
+
+
+  <script>
+    let lines = document.querySelectorAll('.scroll-fade p');
+    let index = 0;
+    setInterval(() => {
+      lines.forEach(l => l.classList.remove('active'));
+      lines[index].classList.add('active');
+      index = (index + 1) % lines.length;
+    }, 1800);
+  </script>
+
+</body>
+</html> -->
+

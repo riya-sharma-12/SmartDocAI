@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartDocAI - More Reasons</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .scroll-fade p { opacity: 0.2; transition: all 0.5s; }
+    .scroll-fade p.active { opacity: 1; transform: scale(1.02); }
+  </style>
+</head>
+<body class="bg-purple-50 text-purple-800">
+
+  <nav class="flex justify-between items-center p-6 max-w-7xl mx-auto">
+    <div class="text-2xl font-bold text-purple-800">SmartDocAI</div>
+    <div class="space-x-6">
+      <a href="/" class="hover:text-purple-600">Home</a>
+      <a href="/features" class="hover:text-purple-600">Features</a>
+      <a href="/more" class="hover:text-purple-600">More</a>
+      <a href="/login" class="hover:text-purple-600">Login</a>
+      <a href="/signup" class="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800">Start Free</a>
+    </div>
+  </nav>
+
+  <section class="py-32 text-center">
+    <h3 class="text-3xl font-bold mb-10">Even more reasons to join SmartDocAI</h3>
+    <div class="scroll-fade max-w-3xl mx-auto space-y-4 text-2xl">
+      <p>Improve your understanding</p>
+      <p>Create a library of summaries</p>
+      <p>Keep track of important details</p>
+      <p>Add notes, never lose a thought</p>
+      <p>Create folders in your library</p>
+      <p>Export in any format</p>
+    </div>
+  </section>
+
+  <script>
+    let lines = document.querySelectorAll('.scroll-fade p');
+    let index = 0;
+    setInterval(() => {
+      lines.forEach(l => l.classList.remove('active'));
+      lines[index].classList.add('active');
+      index = (index + 1) % lines.length;
+    }, 1800);
+  </script>
+
+</body>
+</html>
