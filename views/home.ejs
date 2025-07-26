@@ -73,8 +73,7 @@
       <h1 id="doc-title" class="text-2xl font-bold text-purple-800 mb-4">Select a file to start</h1>
       <p id="doc-summary" class="text-purple-600 mb-6">Your summary, insights, and tools will appear here as you explore.
 <br><br>
-Want to revisit a summary or flashcards you generated earlier?
-Just refresh the page — everything you explored before stays saved in the chat on the right. 
+Your questions and feature results are saved automatically and will appear in the chat as you continue working — no need to start over.
  </p>
       <div id="feature-buttons" class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
         <button onclick="showDetail('summary')" class="bg-white border p-6 rounded-xl shadow hover:bg-yellow-100 transition">📝 Summarize</button>
@@ -170,9 +169,18 @@ async function selectFile(id, name) {
   historyDiv.scrollTop = historyDiv.scrollHeight;
 }
 
+let lastFeatureUsed = null;
+let lastFeatureResponse = null;
+let deferredChat = []; // [{ sender: "user", message }, { sender: "ai", message }]
+
 async function runFeature(featureName) {
   const docId = window.currentDocId;
   document.getElementById('output').innerHTML = `<p>Loading ${featureName}...</p>`;
+
+  // If there's a stored feature, display it in chat first
+  if (lastFeatureUsed && lastFeatureResponse) {
+    appendToChatAsFeature(lastFeatureUsed, lastFeatureResponse);
+  }
 
   try {
     const res = await fetch('/api/ai', {
@@ -182,6 +190,126 @@ async function runFeature(featureName) {
     });
     const data = await res.json();
     document.getElementById('output').innerHTML = `<pre>${data.answer}</pre>`;
+
+    // Store this feature result to display next time
+    lastFeatureUsed = featureName;
+    lastFeatureResponse = data.answer;
+  } catch (err) {
+    document.getElementById('output').innerHTML = `<p class="text-red-600">Failed to load. Please try again.</p>`;
+    console.error("Feature failed:", err);
+  }
+}
+
+function appendToChatAsFeature(feature, response) {
+  const historyDiv = document.getElementById('chat-history');
+
+  const userMessage = `Feature selected: ${feature}`;
+  const aiMessage = response;
+
+  const userBubble = document.createElement('div');
+  userBubble.className = "text-right";
+  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${userMessage}</div>`;
+  historyDiv.appendChild(userBubble);
+
+  const aiBubble = document.createElement('div');
+  aiBubble.className = "text-left";
+  aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1 whitespace-pre-line">${aiMessage}</div>`;
+  historyDiv.appendChild(aiBubble);
+
+  historyDiv.scrollTop = historyDiv.scrollHeight;
+}
+function flushDeferredChat() {
+  const historyDiv = document.getElementById('chat-history');
+  deferredChat.forEach(item => {
+    const bubble = document.createElement('div');
+    bubble.className = item.sender === "user" ? "text-right" : "text-left";
+    bubble.innerHTML = `<div class="inline-block ${item.sender === 'user' ? 'bg-yellow-100' : 'bg-purple-100'} 
+      text-purple-800 p-2 rounded-lg max-w-xs mt-1 whitespace-pre-line">${item.message}</div>`;
+    historyDiv.appendChild(bubble);
+  });
+  deferredChat = []; // clear
+  historyDiv.scrollTop = historyDiv.scrollHeight;
+}
+
+// async function askQuestion() {
+//   const question = document.getElementById('chat-input').value.trim();
+//   if (!question) return;
+
+//   const historyDiv = document.getElementById('chat-history');
+//   const userBubble = document.createElement('div');
+//   userBubble.className = "text-right";
+//   userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${question}</div>`;
+//   historyDiv.appendChild(userBubble);
+//   historyDiv.scrollTop = historyDiv.scrollHeight;
+
+//   document.getElementById('chat-input').value = '';
+
+//   try {
+//     const res = await fetch('/api/ai', {
+//       method: 'POST',
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ docId: window.currentDocId, feature: "chat", question })
+//     });
+//     const data = await res.json();
+//     const aiBubble = document.createElement('div');
+//     aiBubble.className = "text-left";
+//     aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer}</div>`;
+//     historyDiv.appendChild(aiBubble);
+//     historyDiv.scrollTop = historyDiv.scrollHeight;
+//   } catch (err) {
+//     console.error("Chat failed:", err);
+//     const aiBubble = document.createElement('div');
+//     aiBubble.className = "text-left";
+//     aiBubble.innerHTML = `<div class="inline-block bg-red-100 text-red-800 p-2 rounded-lg max-w-xs mt-1">Failed to get response.</div>`;
+//     historyDiv.appendChild(aiBubble);
+//     historyDiv.scrollTop = historyDiv.scrollHeight;
+//   }
+// }
+async function showDetail(featureName) {
+  const docId = window.currentDocId;
+  if (!docId) return alert("Select a document first.");
+
+  // 🧹 Flush previous feature/chat results before starting new
+  flushDeferredChat();
+
+  // ✅ Show the feature label instantly in chat
+  const historyDiv = document.getElementById('chat-history');
+  const userBubble = document.createElement('div');
+  userBubble.className = "text-right";
+  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Feature selected: ${featureName}</div>`;
+  historyDiv.appendChild(userBubble);
+  historyDiv.scrollTop = historyDiv.scrollHeight;
+
+  // Show loading in output pane
+  document.getElementById('output').innerHTML = `<p class="text-gray-700">Loading ${featureName}...</p>`;
+
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docId, feature: featureName })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      document.getElementById('output').innerHTML = `<p class="text-red-500">${data.error}</p>`;
+      return;
+    }
+
+    // Show result in output area
+    let contentHtml = `<pre class="whitespace-pre-line text-gray-700">${data.answer}</pre>`;
+    if (featureName === "flashcards") {
+      contentHtml += `
+        <button onclick="generateFlashcardPDF()" 
+                class="mt-4 bg-yellow-400 text-purple-800 font-semibold py-2 px-4 rounded hover:bg-yellow-300 transition">
+          📥 Download Flashcards PDF
+        </button>`;
+    }
+    document.getElementById('output').innerHTML = `<div class="space-y-4">${contentHtml}</div>`;
+
+    // ⏳ Defer only the answer (not the "Feature: ..." part)
+    deferredChat.push({ sender: "ai", message: data.answer });
+
   } catch (err) {
     document.getElementById('output').innerHTML = `<p class="text-red-600">Failed to load. Please try again.</p>`;
     console.error("Feature failed:", err);
@@ -189,127 +317,32 @@ async function runFeature(featureName) {
 }
 
 
-async function askQuestion() {
-  const question = document.getElementById('chat-input').value.trim();
+async function askQuestion(e) {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const question = input.value.trim();
   if (!question) return;
 
-  const historyDiv = document.getElementById('chat-history');
+  // 🧹 Show previous feature chat if any
+  flushDeferredChat();
+
+  const history = document.getElementById('chat-history');
+
+  // 💬 Show user question immediately
   const userBubble = document.createElement('div');
   userBubble.className = "text-right";
   userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${question}</div>`;
-  historyDiv.appendChild(userBubble);
-  historyDiv.scrollTop = historyDiv.scrollHeight;
-
-  document.getElementById('chat-input').value = '';
-
-  try {
-    const res = await fetch('/api/ai', {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ docId: window.currentDocId, feature: "chat", question })
-    });
-    const data = await res.json();
-    const aiBubble = document.createElement('div');
-    aiBubble.className = "text-left";
-    aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer}</div>`;
-    historyDiv.appendChild(aiBubble);
-    historyDiv.scrollTop = historyDiv.scrollHeight;
-  } catch (err) {
-    console.error("Chat failed:", err);
-    const aiBubble = document.createElement('div');
-    aiBubble.className = "text-left";
-    aiBubble.innerHTML = `<div class="inline-block bg-red-100 text-red-800 p-2 rounded-lg max-w-xs mt-1">Failed to get response.</div>`;
-    historyDiv.appendChild(aiBubble);
-    historyDiv.scrollTop = historyDiv.scrollHeight;
-  }
-}
-async function showDetail(feature) {
-  const docId = window.currentDocId;
-  if (!docId) return alert("Select a document first.");
-
-  document.getElementById('output').innerHTML = `<p class="text-gray-700">Loading ${feature}...</p>`;
-
-  const res = await fetch('/api/ai', {
-    method: 'POST',
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ docId, feature })
-  });
-  const data = await res.json();
-
-  if (data.error) {
-    document.getElementById('output').innerHTML = `<p class="text-red-500">${data.error}</p>`;
-    return;
-  }
-
-  let contentHtml = `<pre class="whitespace-pre-line text-gray-700">${data.answer}</pre>`;
-
-  // ✅ Only for flashcards, add the download button
-  if (feature === "flashcards") {
-    contentHtml += `
-      <button onclick="generateFlashcardPDF()" 
-              class="mt-4 bg-yellow-400 text-purple-800 font-semibold py-2 px-4 rounded hover:bg-yellow-300 transition">
-        📥 Download Flashcards PDF
-      </button>
-    `;
-  }
-
-  document.getElementById('output').innerHTML = `<div class="space-y-4">${contentHtml}</div>`;
-}
-
-
-async function askQuestion(e) {
-  e.preventDefault();
-  const input = document.getElementById('chat-input');
-  const question = input.value.trim();
-  if (!question) return;
-
-  // Append user message
-  const history = document.getElementById('chat-history');
-  const userBubble = document.createElement('div');
-  userBubble.className = "text-right";
-  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs">${question}</div>`;
-  history.appendChild(userBubble);
-
-  // Send to backend
-  const res = await fetch('/api/ai', {
-    method: 'POST',
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ docId: window.currentDocId, feature: 'chat', question })
-  });
-  const data = await res.json();
-
-  // Append AI response
-  const aiBubble = document.createElement('div');
-  aiBubble.className = "text-left";
-aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer.replace(/\n/g, '<br>')}</div>`;
-  history.appendChild(aiBubble);
-  history.scrollTop = history.scrollHeight;
-  input.value = '';
-}
-
-async function askQuestion(e) {
-  e.preventDefault();
-  const input = document.getElementById('chat-input');
-  const question = input.value.trim();
-  if (!question) return;
-
-  const history = document.getElementById('chat-history');
-
-  // Append user message
-  const userBubble = document.createElement('div');
-  userBubble.className = "text-right";
-  userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs">${question}</div>`;
   history.appendChild(userBubble);
   input.value = '';
 
-  // Show "thinking"
+  // ⏳ "Thinking..." message
   const aiBubble = document.createElement('div');
   aiBubble.className = "text-left";
   aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Thinking...</div>`;
   history.appendChild(aiBubble);
   history.scrollTop = history.scrollHeight;
 
-  // Call backend AI
+  // 🧠 Get AI response
   try {
     const res = await fetch('/api/ai', {
       method: 'POST',
@@ -318,15 +351,17 @@ async function askQuestion(e) {
     });
     const data = await res.json();
     if (data.error) {
-      aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Error: ${data.error}</div>`;
+      aiBubble.innerHTML = `<div class="inline-block bg-red-100 text-red-800 p-2 rounded-lg max-w-xs mt-1">${data.error}</div>`;
     } else {
-      aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer}</div>`;
+      aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${data.answer.replace(/\n/g, "<br>")}</div>`;
     }
   } catch (err) {
-    aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Server error.</div>`;
+    aiBubble.innerHTML = `<div class="inline-block bg-red-100 text-red-800 p-2 rounded-lg max-w-xs mt-1">Server error.</div>`;
   }
+
   history.scrollTop = history.scrollHeight;
 }
+
 async function deleteFile(e, fileId) {
   e.stopPropagation();
 

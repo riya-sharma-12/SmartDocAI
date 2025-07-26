@@ -120,14 +120,30 @@ else if (feature === "time") {
   
   return res.json({ answer: readingTime });
 }
-else if (feature === "chat") {
-      prompt = `Answer the user's question based on this document content.
+// else if (feature === "chat") {
+//       prompt = `Answer the user's question based on this document content.
 
-Question: ${question}
+// Question: ${question}
+
+// Document content:
+// ${text}`;
+else if (feature === "chat") {
+  prompt = `
+You are SmartDocAI, a helpful AI assistant.
+
+If the user's question is related to the document below, use the document to answer.
+If not, answer the question using your own general knowledge — do NOT say you are limited to the document.
 
 Document content:
-${text}`;
-    } else {
+${text}
+
+User's question: ${question}
+
+Please provide a complete and helpful answer:
+`;
+}
+
+ else {
       return res.status(400).json({ error: "Invalid feature." });
     }
 
@@ -139,7 +155,8 @@ ${text}`;
 let userMessage;
 if (feature === "chat") {
   userMessage = question;  // just the text
-} else {
+} 
+else {
   userMessage = `Feature: ${feature}${question ? `\n${question}` : ""}`;
 }
 
