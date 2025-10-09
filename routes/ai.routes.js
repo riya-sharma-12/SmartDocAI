@@ -148,7 +148,8 @@ Please provide a complete and helpful answer:
     }
 
     // Call Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 // 6. Always save to chat history
