@@ -307,7 +307,6 @@ async function showDetail(featureName) {
     }
     document.getElementById('output').innerHTML = `<div class="space-y-4">${contentHtml}</div>`;
 
-    // ⏳ Defer only the answer (not the "Feature: ..." part)
     deferredChat.push({ sender: "ai", message: data.answer });
 
   } catch (err) {
@@ -323,19 +322,16 @@ async function askQuestion(e) {
   const question = input.value.trim();
   if (!question) return;
 
-  // 🧹 Show previous feature chat if any
   flushDeferredChat();
 
   const history = document.getElementById('chat-history');
 
-  // 💬 Show user question immediately
   const userBubble = document.createElement('div');
   userBubble.className = "text-right";
   userBubble.innerHTML = `<div class="inline-block bg-yellow-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">${question}</div>`;
   history.appendChild(userBubble);
   input.value = '';
 
-  // ⏳ "Thinking..." message
   const aiBubble = document.createElement('div');
   aiBubble.className = "text-left";
   aiBubble.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 p-2 rounded-lg max-w-xs mt-1">Thinking...</div>`;
